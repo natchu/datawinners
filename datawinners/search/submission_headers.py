@@ -23,7 +23,7 @@ class SubmissionHeader():
         ds_field_names, labels, codes = get_entity_type_fields(self.dbm)
         ds_dict = OrderedDict()
         for field in ds_field_names:
-            ds_dict[self.form_model.id + '_reporter.' + field] = field
+            ds_dict[self.form_model.id + '_reporter.' + field] = "Data Sender: "+field
         header_dict.update(ds_dict)
 
     def update_datasender_header_for_sort(self, header_list):
@@ -160,7 +160,6 @@ class SuccessSubmissionHeader(SubmissionHeader):
 class MobileSubmissionHeader(SubmissionHeader):
     def update_static_header_info(self):
         header_dict = OrderedDict()
-        header_dict.update({SubmissionIndexConstants.DATASENDER_NAME_KEY: "Data Sender"})
         header_dict.update({"date": "Submission Date"})
         return header_dict
 
