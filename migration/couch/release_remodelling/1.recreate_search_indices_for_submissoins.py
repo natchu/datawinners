@@ -68,6 +68,7 @@ def create_search_indices_for_submissions(db_name):
 
 
 es = get_elasticsearch_handle()
-migrate(all_db_names(), create_search_indices_for_submissions, version=(25, 0, 1), threads=3)
+dbs_to_run = ['hni_palme_flm546389', 'hni_usaid-mikolo_lei526034']
+migrate(dbs_to_run, create_search_indices_for_submissions, version=(25, 0, 1), threads=3)
 
 
