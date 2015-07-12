@@ -19,6 +19,7 @@ def create_index(dbm, form_model, logger):
     es_handle = get_elasticsearch_handle(timeout=2400)
 
     survey_response_docs = []
+    count = 0
     for row in rows:
         survey_response = SurveyResponseDocument._wrap_row(row)
         try:
@@ -26,6 +27,14 @@ def create_index(dbm, form_model, logger):
             _update_with_form_model_fields(dbm, survey_response, search_dict, form_model)
             search_dict.update({'id': survey_response.id})
             survey_response_docs.append(search_dict)
+            count += 1
+            if count == 7500:
+                try:
+                    es_handle.bulk_index(dbm.database_name, form_model.id, survey_response_docs)
+                    survey_response_docs = []
+                    count = 0
+                except Exception as e:
+                    logger.exception(e.message+'project_id:'+form_model.id+'| survey_response_id: '+survey_response.id)
         except Exception as e:
             logger.exception(e.message+'project_id:'+form_model.id+'| survey_response_id: '+survey_response.id)
 
