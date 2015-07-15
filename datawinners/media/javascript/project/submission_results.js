@@ -91,6 +91,17 @@ DW.SubmissionLogTable = function (options) {
         });
 
         $(colvis.button()).insertAfter('div.dataTables_processing');
+        $('body').on('click','.ColVis_Special', function(event){
+            $.post("/project/hide_submission_log_column/", {
+                        'data': JSON.stringify({
+                            "questionnaire_code": $("#questionnaire_code").val(),
+                            "visible": $(event.target).hasClass('ColVis_ShowAll'),
+                            "all_columns": true,
+                            "tab": options.tabName
+                        }),
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                    });
+        });
     }
 
     function _init_submission_log_table(cols) {

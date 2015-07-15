@@ -36,3 +36,20 @@ def remove_all_hidden_columns(user, questionnaire_id):
 def remove_hidden_columns_for_all_users(questionnaire_id):
     preferences = ProjectPreferences.objects.filter(project_id=questionnaire_id)
     delete_preferences(preferences)
+
+
+def create_preference(tab, column_indices, questionnaire, user):
+    preference_name = tab+"_hide_column"
+    for column in column_indices:
+        preference = ProjectPreferences(user_id=user.id, project_id=questionnaire.id,
+                                        preference_name=preference_name, preference_value=column)
+        preference.save()
+
+
+def remove_preferences(tab, column_indices, questionnaire, user):
+    preference_name = tab+"_hide_column"
+    for column in column_indices:
+        preferences = ProjectPreferences.objects.filter(user=user, project_id=questionnaire.id,
+                                                        preference_name=preference_name,
+                                                        preference_value=column)
+        delete_preferences(preferences)

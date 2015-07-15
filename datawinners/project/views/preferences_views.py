@@ -5,9 +5,28 @@ from django.views.decorators.csrf import csrf_exempt
 
 from datawinners.accountmanagement.decorators import valid_web_user, is_datasender
 from datawinners.main.database import get_database_manager
-from datawinners.preferences.models import ProjectPreferences
-from datawinners.project.preferences import get_columns_to_hide
+from datawinners.project.preferences import get_columns_to_hide, create_preference, remove_preferences
+from datawinners.search.submission_headers import HeaderFactory
 from mangrove.form_model.form_model import get_form_model_by_code
+
+
+def get_column_indices(post_data, dbm, form_model, tab):
+    all_columns = post_data.get('all_columns', None)
+    if not all_columns:
+        return [post_data.get('column')]
+    header = HeaderFactory(dbm, form_model).create_header(tab)
+    headers = header.get_field_names_as_header_name()
+    column_indices = []
+    for index in range(headers.__len__()):
+        column_indices.append(index+1)
+    return column_indices
+
+
+def _update_preferences(tab, column_indices, questionnaire, user, visible):
+    if not visible:
+        create_preference(tab, column_indices, questionnaire, user)
+    else:
+        remove_preferences(tab, column_indices, questionnaire, user)
 
 
 @valid_web_user
@@ -16,23 +35,13 @@ from mangrove.form_model.form_model import get_form_model_by_code
 def hide_submission_log_column(request):
     user = request.user
     post_data = json.loads(request.POST.get('data'))
-    preference_name = post_data.get('tab') + "_hide_column"
+    tab = post_data.get('tab')
     visible = post_data.get('visible')
-    preference_value = post_data.get('column')
     form_code = post_data.get('questionnaire_code')
     manager = get_database_manager(request.user)
     questionnaire = get_form_model_by_code(manager, form_code)
-    if not visible:
-        preference = ProjectPreferences(user_id=user.id, project_id=questionnaire.id,
-                                        preference_name=preference_name, preference_value=preference_value)
-        preference.save()
-    else:
-        preferences = ProjectPreferences.objects.filter(user=user, project_id=questionnaire.id,
-                                                        preference_name=preference_name,
-                                                        preference_value=preference_value)
-
-        for preference in preferences:
-            preference.delete()
+    column_indices = get_column_indices(post_data, manager, questionnaire, tab)
+    _update_preferences(tab, column_indices, questionnaire, user, visible)
     return HttpResponse(json.dumps({'success': True}))
 
 
