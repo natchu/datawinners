@@ -41,7 +41,7 @@ class TestLanguageTab(HeadlessRunnerTest):
         self.language_page.revert_customized_messages_to_default()
         self.language_page.save_changes()
 
-    @attr('functional_test')
+    @attr('functional_testa')
     def test_languages_tab(self):
 
         self.check_for_default_en_messages()
