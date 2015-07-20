@@ -34,7 +34,7 @@ def get_default_browser_name():
 
 def get_driver_for_browser(browser):
     browser = browser if browser else get_default_browser_name()
-    sys.stderr.write("using driver for browser: %s\n" % browser)
+    #sys.stderr.write("using driver for browser: %s\n" % browser)
     if browser == "firefox":
         fprofile = FirefoxProfile()
         driver = webdriver.Firefox(fprofile)
@@ -142,7 +142,7 @@ class DriverWrapper(object):
         try:
             return self._driver.find_element(by=locator_dict[BY], value=locator_dict[LOCATOR])
         except NoSuchElementException as e:
-            self.create_screenshot()
+            self.create_screenshot("not-found.png")
             raise CouldNotLocateElementException(selector=locator_dict[BY], locator=locator_dict[LOCATOR])
 
     def find_elements_(self, locator_dict):
